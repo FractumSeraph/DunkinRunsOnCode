@@ -12,6 +12,7 @@ from configparser import ConfigParser  # Used for settings
 import splinter
 from selenium.webdriver.chrome.service import Service
 from splinter.exceptions import DriverNotFoundError
+from telegram import update
 from webdriver_manager.chrome import ChromeDriverManager
 
 # python-telegram-bot
@@ -52,7 +53,7 @@ def start():
 
     gc = gspread.service_account()
     sh = gc.open("DunkinCodes")
-    print(sh.worksheet("Scores").cell(1, 3).value)  # Cell(Number, Letter)
+    # print(sh.worksheet("Scores").cell(1, 3).value)  # Cell(Number, Letter)
 
 
 def readConfig():
