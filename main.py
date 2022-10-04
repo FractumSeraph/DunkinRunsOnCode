@@ -3,7 +3,7 @@
 
 import logging  # Used to make log messages
 import os
-from datetime import date
+from datetime import date, datetime
 from time import sleep  # Used for sleep()
 
 import gspread  # Used to interface with Google Sheets
@@ -97,8 +97,8 @@ def sanitize(unsanitizedCode):
 
 
 # opts = Options()
-# ua = UserAgent()
-# userAgent = ua.random
+ua = UserAgent()
+userAgent = ua.random
 # logging.info("Using useragent: " + userAgent)
 # opts.add_argument(f'user-agent={userAgent}')
 
@@ -111,10 +111,9 @@ service = Service(ChromeDriverManager().install())
 
 def submitSurvey(codeToSubmit, user):
     logging.info("Beginning of submitSurvey function")
-    ua = UserAgent()
-    userAgent = ua.random
     logging.info("Using useragent: " + userAgent)
     browser = splinter.Browser('chrome', headless=True, user_agent=userAgent)
+    sleep(10)
     #  browser = splinter.Browser('chrome', user_agent=userAgent)
     try:
         logging.info("Running browser.visit")
@@ -139,10 +138,11 @@ def submitSurvey(codeToSubmit, user):
         browser.find_by_id("buttonNext").click()
         sleep(5)
         emailStart = """dunkincode+"""
-        emailTime = str(datetime.datetime.today()).replace('-', '').replace(':', '').replace('.', '').replace(' ', '')[
-                    0:14]  # I am positive there's a better way to do this. But it probably involves learning Regex.
+        # emailTime = str(datetime.datetime.today()).replace('-', '').replace(':', '').replace('.', '').replace(' ',
+        # '')[ 0:14]  # I am positive there's a better way to do this. But it probably involves learning Regex.
         emailEnd = """@harakirimail.com"""
-        email = emailStart + emailTime + emailEnd
+        #  email = emailStart + emailTime + emailEnd
+        email = """dunkincode@harakirimail.com"""
         browser.fill("spl_q_inrest_email_address_txt", email)
         sleep(1)
         browser.find_by_id("onf_q_inrest_rcpt_additional_questions_alt_2").click()
@@ -184,7 +184,7 @@ def addCodes(update: Update, context: CallbackContext):
             continue
         logging.info(friendlyName + " has processed code " + str(sanitized_code))
         update.message.reply_text(friendlyName +
-                                  " has successfully completed code " + str(sanitized_code) +
+                                  " has processed code " + str(sanitized_code) +
                                   " Using web browser: " + userAgent)
 
 
