@@ -135,7 +135,12 @@ def submitSurvey(codeToSubmit, user):
         sleep(5)
         browser.find_by_id("buttonNext").click()
         sleep(5)
-        browser.fill("spl_q_inrest_email_address_txt", """dunkincode@harakirimail.com""")
+        emailStart = """dunkincode+"""
+        emailTime = str(datetime.datetime.today()).replace('-', '').replace(':', '').replace('.', '').replace(' ', '')[
+                    0:14]  # I am positive there's a better way to do this. But it probably involves learning Regex.
+        emailEnd = """@harakirimail.com"""
+        email = emailStart + emailTime + emailEnd
+        browser.fill("spl_q_inrest_email_address_txt", email)
         sleep(1)
         browser.find_by_id("onf_q_inrest_rcpt_additional_questions_alt_2").click()
         sleep(2)
