@@ -96,11 +96,11 @@ def sanitize(unsanitizedCode):
     return sanitizedCode
 
 
-opts = Options()
-ua = UserAgent()
-userAgent = ua.random
-logging.info("Using useragent: " + userAgent)
-opts.add_argument(f'user-agent={userAgent}')
+# opts = Options()
+# ua = UserAgent()
+# userAgent = ua.random
+# logging.info("Using useragent: " + userAgent)
+# opts.add_argument(f'user-agent={userAgent}')
 
 service = Service(ChromeDriverManager().install())
 
@@ -111,6 +111,9 @@ service = Service(ChromeDriverManager().install())
 
 def submitSurvey(codeToSubmit, user):
     logging.info("Beginning of submitSurvey function")
+    ua = UserAgent()
+    userAgent = ua.random
+    logging.info("Using useragent: " + userAgent)
     browser = splinter.Browser('chrome', headless=True, user_agent=userAgent)
     #  browser = splinter.Browser('chrome', user_agent=userAgent)
     try:
