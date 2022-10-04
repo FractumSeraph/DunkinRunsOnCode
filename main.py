@@ -105,6 +105,7 @@ opts.add_argument(f'user-agent={userAgent}')
 service = Service(ChromeDriverManager().install())
 
 
+# Moved to inside the function to force new userAgent per command.
 #  browser = splinter.Browser('chrome', headless=True, user_agent=userAgent)
 #  browser = splinter.Browser('chrome', user_agent=userAgent)
 
@@ -139,7 +140,7 @@ def submitSurvey(codeToSubmit, user):
         browser.find_by_id("onf_q_inrest_rcpt_additional_questions_alt_2").click()
         sleep(2)
         browser.find_by_id("buttonNext").click()
-        sleep(2)
+        sleep(5)
     except DriverNotFoundError:
         logging.error("Webdriver not found exception!")
         pass
@@ -150,9 +151,16 @@ def submitSurvey(codeToSubmit, user):
 
 
 def addCodes(update: Update, context: CallbackContext):
-    logging.debug("add_to_list has been called by " + str(update.message.from_user.id))
     user = update.message.from_user
-    logging.info("Conversation started with " + str(user.username) + " " + str(user.id))
+    friendlyName = ""
+    if str(user.first_name) != "":
+        friendlyName = str(user.first_name)
+    elif str(user.username) != "":
+        friendlyName = str(user.username)
+    else:
+        friendlyName = str(user.id)
+    logging.debug("add_to_list has been called by " + friendlyName + " " + str(user.id))
+    logging.info("Conversation started with " + friendlyName)
     index: int
     for index, line in enumerate(context.args):
         line = line + " "
@@ -166,8 +174,8 @@ def addCodes(update: Update, context: CallbackContext):
         else:
             update.message.reply_text("Failed!")
             continue
-        logging.info(str(user.id) + " has processed code " + str(sanitized_code))
-        update.message.reply_text(str(user.id) +
+        logging.info(friendlyName + " has processed code " + str(sanitized_code))
+        update.message.reply_text(friendlyName +
                                   " has successfully completed code " + str(sanitized_code) +
                                   " Using web browser: " + userAgent)
 
