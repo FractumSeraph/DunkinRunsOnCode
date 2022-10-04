@@ -20,7 +20,6 @@ from splinter.exceptions import DriverNotFoundError
 from telegram import update
 from webdriver_manager.chrome import ChromeDriverManager
 
-
 # python-telegram-bot
 import telegram
 from telegram.update import Update
@@ -48,7 +47,7 @@ logging.basicConfig(
 
 def start():
     logging.info("Beginning of start function.")
-    exampleCode = "839035018005092727"
+    # exampleCode = "839035018005092727"
 
     # Read configuration
     # Accept input
@@ -58,7 +57,7 @@ def start():
     # submitSurvey(sanitize(exampleCode))
 
     gc = gspread.service_account()
-    sh = gc.open("DunkinCodes")
+    # sh = gc.open("DunkinCodes")
     # print(sh.worksheet("Scores").cell(1, 3).value)  # Cell(Number, Letter)
 
 
@@ -100,10 +99,12 @@ def sanitize(unsanitizedCode):
 opts = Options()
 ua = UserAgent()
 userAgent = ua.random
+logging.info("Using useragent: " + userAgent)
 opts.add_argument(f'user-agent={userAgent}')
 
-
 service = Service(ChromeDriverManager().install())
+
+
 #  browser = splinter.Browser('chrome', headless=True, user_agent=userAgent)
 #  browser = splinter.Browser('chrome', user_agent=userAgent)
 
@@ -158,15 +159,17 @@ def addCodes(update: Update, context: CallbackContext):
         sanitized_code = sanitize(line)
         if sanitized_code != "":
             submitSurvey(str(sanitized_code), str(user.first_name))
-            update.message.reply_text(
-                "Code " + sanitized_code + " was completed! " + "Not waiting 20 minutes.")
+            #  update.message.reply_text(
+            #    "Code " + sanitized_code + " was completed! " + "Not waiting 20 minutes.")
             # sleep(1200)
             # TODO Add code to sheets
         else:
             update.message.reply_text("Failed!")
             continue
-        logging.info(str(user.id) + " has successfully completed code " + str(sanitized_code))
-        update.message.reply_text(str(user.id) + " has successfully completed code " + str(sanitized_code))
+        logging.info(str(user.id) + " has processed code " + str(sanitized_code))
+        update.message.reply_text(str(user.id) +
+                                  " has successfully completed code " + str(sanitized_code) +
+                                  " Using web browser: " + userAgent)
 
 
 def tgstart(update: Update):
