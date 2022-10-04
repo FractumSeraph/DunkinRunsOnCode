@@ -5,15 +5,21 @@ import logging  # Used to make log messages
 import os
 from datetime import date
 from time import sleep  # Used for sleep()
+
 import gspread  # Used to interface with Google Sheets
 from configparser import ConfigParser  # Used for settings
 
 # Imports for web automation
 import splinter
+from fake_useragent import UserAgent
+from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+
 from splinter.exceptions import DriverNotFoundError
 from telegram import update
 from webdriver_manager.chrome import ChromeDriverManager
+
 
 # python-telegram-bot
 import telegram
@@ -91,15 +97,20 @@ def sanitize(unsanitizedCode):
     return sanitizedCode
 
 
+opts = Options()
+ua = UserAgent()
+userAgent = ua.random
+opts.add_argument(f'user-agent={userAgent}')
+
+
 service = Service(ChromeDriverManager().install())
-browser = splinter.Browser('chrome', headless=True)
-
-
-# browser = splinter.Browser('chrome')
-
+#  browser = splinter.Browser('chrome', headless=True, user_agent=userAgent)
+#  browser = splinter.Browser('chrome', user_agent=userAgent)
 
 def submitSurvey(codeToSubmit, user):
     logging.info("Beginning of submitSurvey function")
+    browser = splinter.Browser('chrome', headless=True, user_agent=userAgent)
+    #  browser = splinter.Browser('chrome', user_agent=userAgent)
     try:
         logging.info("Running browser.visit")
         browser.visit('http://dunkinrunsonyou.com/')
@@ -125,8 +136,9 @@ def submitSurvey(codeToSubmit, user):
         browser.fill("spl_q_inrest_email_address_txt", """dunkincode@harakirimail.com""")
         sleep(1)
         browser.find_by_id("onf_q_inrest_rcpt_additional_questions_alt_2").click()
-        sleep(1)
+        sleep(2)
         browser.find_by_id("buttonNext").click()
+        sleep(2)
     except DriverNotFoundError:
         logging.error("Webdriver not found exception!")
         pass
@@ -147,8 +159,8 @@ def addCodes(update: Update, context: CallbackContext):
         if sanitized_code != "":
             submitSurvey(str(sanitized_code), str(user.first_name))
             update.message.reply_text(
-                "Code " + sanitized_code + " was completed! " + "Waiting 20 minutes.")
-            sleep(1200)
+                "Code " + sanitized_code + " was completed! " + "Not waiting 20 minutes.")
+            # sleep(1200)
             # TODO Add code to sheets
         else:
             update.message.reply_text("Failed!")
