@@ -56,9 +56,20 @@ def start():
     readConfig()
     # submitSurvey(sanitize(exampleCode))
 
+
+def addToSheets(surveycode, submittedBy, timeSubmitted):
+
+    # Row number is derived from survey code.
+    # Strip out the store number, date, time, and time offset.
+    rowNumber = surveycode[0:3] + surveycode
+
     gc = gspread.service_account()
-    # sh = gc.open("DunkinCodes")
-    # print(sh.worksheet("Scores").cell(1, 3).value)  # Cell(Number, Letter)
+    sh = gc.open("DunkinCodes")
+    # print(sh.worksheet("Codes").cell(1, 3).value)  # Cell(Number, Letter)
+    sh.worksheet("Codes").update(str("A"+surveycode), str(surveycode))  # Set the value of surveycode:1 to the survey code itself.
+    sh.worksheet("Codes").update(str("B"+surveycode), str("true"))  # Set the sanitized value to true, since this code is called after sanitize()
+    sh.worksheet("Codes").update(str("C"+surveycode), str(submittedBy))
+    sh.worksheet("Codes").update(str("D"+surveycode), str(timeSubmitted))
 
 
 def readConfig():
@@ -175,12 +186,17 @@ def addCodes(update: Update, context: CallbackContext):
         sanitized_code = sanitize(line)
         if sanitized_code != "":
             submitSurvey(str(sanitized_code), str(user.first_name))
-            #  update.message.reply_text(
-            #    "Code " + sanitized_code + " was completed! " + "Not waiting 20 minutes.")
-            # sleep(1200)
-            # TODO Add code to sheets
+            update.message.reply_text("Code " + sanitized_code + " was processed. " + "Waiting 10 minutes.")
+            try:
+                print("Removed until fixed.")
+                #  logging.info("Added code " + str(sanitized_code) + " to Google Sheets.")
+                #  currentTime = str(datetime.today()).replace('-', '').replace(':', '').replace('.', '').replace(' ', '')[0:14]
+                #  addToSheets(sanitized_code, user.id, currentTime)
+            except Exception as e:
+                logging.error("Exception adding code to Google Sheets: " + str(e))
+            sleep(600)
         else:
-            update.message.reply_text("Failed!")
+            update.message.reply_text("Failed! (Reason can be found in the logs for now, instead of in this message.)")
             continue
         logging.info(friendlyName + " has processed code " + str(sanitized_code))
         update.message.reply_text(friendlyName +
